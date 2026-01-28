@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    triggers {
+        cron('H/5 * * * *')
+    }
+
+    stages {
+        stage('Clone') {
+            steps {
+                git 'https://github.com/Adithya02-alt/newapp.git'
+            }
+        }
+
+        stage('Install & Build') {
+            steps {
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t newapp .'
+            }
+        }
+
+        stage('Deploy to Docker Swarm') {
+            steps {
+                sh 'docker stack deploy -c docker-compose.yml newapp'
+            }
+        }
+    }
+}
